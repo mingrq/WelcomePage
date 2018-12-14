@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WelcomePage">
+        <attr name="indicatorHeight" format="dimension" />
+        <attr name="indicatorBgColor" format="color" />
+        <attr name="indicatorSize" format="dimension" />
+        <attr name="indicatorSelecter" format="reference" />
+    </declare-styleable>
+
+</resources>
