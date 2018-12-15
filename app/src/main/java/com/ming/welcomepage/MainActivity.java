@@ -33,5 +33,6 @@ public class MainActivity extends AppCompatActivity {
         mList.add(info3);
         welcomePage.setData(mList);
         welcomePage.commit();
+
     }
 }

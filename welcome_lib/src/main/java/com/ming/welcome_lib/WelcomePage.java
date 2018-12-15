@@ -6,16 +6,24 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,6 +61,7 @@ public class WelcomePage extends FrameLayout {
     private ViewPager viewPager;
     private RadioGroup indicator;
     private List<Info> infoList;
+    private List<View> imageViewList;
 
     public WelcomePage(@NonNull Context context) {
         this(context, null);
@@ -140,8 +149,8 @@ public class WelcomePage extends FrameLayout {
         StateListDrawable drawable = new StateListDrawable();
         Drawable normal = context.getResources().getDrawable(unIndicator);
         Drawable checked = context.getResources().getDrawable(indicator);
-        drawable.addState(new int[]{android.R.attr.checkable}, checked);
-        drawable.addState(new int[]{-android.R.attr.checkable}, normal);
+        drawable.addState(new int[]{android.R.attr.checked}, checked);
+        drawable.addState(new int[]{-android.R.attr.checked}, normal);
     }
 
     /**
@@ -171,5 +180,70 @@ public class WelcomePage extends FrameLayout {
         this.infoList = infoList;
     }
 
+    /**
+     * 初始化图片
+     */
+    private void initImage() {
+        imageViewList = new ArrayList<>();
+        for (int i = 0; i < infoList.size(); i++) {
+            String uri = infoList.get(i).bannerUri;
+            ImageView imageView = new ImageView(context);
+            imageView.setId(i);
+            imageView.setBackgroundColor(0x303F9F);
+            Picasso.with(context).load(uri).error(R.drawable.unslideindicator).into(imageView);
+            imageViewList.add(imageView);
+        }
+    }
 
+    /**
+     * 初始化指示器
+     */
+    private void initIndicator() {
+        for (int k = 0; k < infoList.size(); k++) {
+            RadioButton rIndicator = new RadioButton(context);
+            rIndicator.setId(k);
+            rIndicator.setBackgroundResource(R.drawable.selecter_slideindicator);
+            rIndicator.setButtonDrawable(null);
+            indicator.addView(rIndicator);
+        }
+        ((RadioButton)indicator.getChildAt(2)).setChecked(true);
+    }
+
+    public void commit() {
+        initImage();
+        initIndicator();
+        viewPager.setAdapter(new WelcomePagerAdapter());
+    }
+
+    /**
+     * =================================================================
+     * <p>
+     * 轮播图适配器
+     * =================================================================
+     */
+
+    class WelcomePagerAdapter extends PagerAdapter {
+
+        @Override
+        public int getCount() {
+            return infoList == null ? 0 : infoList.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object o) {
+            return view == o;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            container.addView(imageViewList.get(position));
+            return imageViewList.get(position);
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+            container.removeView(imageViewList.get(position));
+        }
+    }
 }
