@@ -63,6 +63,7 @@ public class WelcomePage extends FrameLayout {
      * 指示器间距
      */
     private float indicatorMargin;
+    private int indicatorEn;
 
     private TypedArray array;
     private Context context;
@@ -173,8 +174,8 @@ public class WelcomePage extends FrameLayout {
         StateListDrawable drawable = new StateListDrawable();
         Drawable normal = context.getResources().getDrawable(unIndicator);
         Drawable checked = context.getResources().getDrawable(indicator);
-        drawable.addState(new int[]{android.R.attr.checked}, checked);
-        drawable.addState(new int[]{-android.R.attr.checked}, normal);
+        drawable.addState(new int[]{android.R.attr.enabled}, checked);
+        drawable.addState(new int[]{-android.R.attr.enabled}, normal);
     }
 
 
@@ -226,7 +227,9 @@ public class WelcomePage extends FrameLayout {
 
             @Override
             public void onPageSelected(int i) {
-
+                indicator.getChildAt(i).setEnabled(true);
+                indicator.getChildAt(indicatorEn).setEnabled(false);
+                indicatorEn = i;
             }
 
             @Override
@@ -259,15 +262,18 @@ public class WelcomePage extends FrameLayout {
         for (int k = 0; k < infoList.size(); k++) {
             View vIndicator = new View(context);
             vIndicator.setId(k);
+
             int size = (int) (indicatorSize + 0.5f);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size,size);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
             params.leftMargin = (int) (indicatorMargin / 2 + 0.5f);
             params.rightMargin = (int) (indicatorMargin / 2 + 0.5f);
             vIndicator.setLayoutParams(params);
-            vIndicator.setBackground(drawable);
+            vIndicator.setBackgroundResource(indicatorSelecter);
+            vIndicator.setEnabled(false);
             indicator.addView(vIndicator);
         }
-
+        indicatorEn = 0;
+        indicator.getChildAt(indicatorEn).setEnabled(true);
     }
 
 
