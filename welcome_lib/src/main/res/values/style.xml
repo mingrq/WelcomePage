@@ -4,6 +4,7 @@
         <attr name="indicatorHeight" format="dimension" />
         <attr name="indicatorBgColor" format="color" />
         <attr name="indicatorSize" format="dimension" />
+        <attr name="indicatorMargin" format="dimension" />
         <attr name="indicatorSelecter" format="reference" />
     </declare-styleable>
 

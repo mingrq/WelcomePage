@@ -10,10 +10,12 @@
         android:layout_height="match_parent" />
 
 
-    <RadioGroup
+    <LinearLayout
         android:id="@+id/indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="horizontal"></RadioGroup>
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+    </LinearLayout>
 </RelativeLayout>

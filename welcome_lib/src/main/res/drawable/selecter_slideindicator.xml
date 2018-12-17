@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:state_checked="true">
-    <shape android:shape="oval">
-        <size
-            android:width="20dp"
-            android:height="20dp" />
-        <solid android:color="#ffffff" />
-    </shape>
-</item>
-    <item android:state_checked="false">
-        <shape android:shape="oval">
-            <size
-                android:width="20dp"
-                android:height="20dp" />
-            <solid android:color="#dcdbdb" />
-        </shape>
-    </item>
+<item android:state_selected="true" android:drawable="@drawable/slideindicator"/>
+
+    <item android:state_selected="false" android:drawable="@drawable/unslideindicator"/>
+
 </selector>

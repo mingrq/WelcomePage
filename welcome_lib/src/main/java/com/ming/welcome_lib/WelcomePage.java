@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +23,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
-import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -56,12 +58,19 @@ public class WelcomePage extends FrameLayout {
      */
     int indicatorSelecter;
 
+
+    /**
+     * 指示器间距
+     */
+    private float indicatorMargin;
+
     private TypedArray array;
     private Context context;
     private ViewPager viewPager;
-    private RadioGroup indicator;
+    private LinearLayout indicator;
     private List<Info> infoList;
-    private List<View> imageViewList;
+    private List<ImageView> imageViewList;
+    private Drawable drawable;
 
     public WelcomePage(@NonNull Context context) {
         this(context, null);
@@ -84,8 +93,9 @@ public class WelcomePage extends FrameLayout {
     private void init() {
         setIndicatorSelecter(array.getResourceId(R.styleable.WelcomePage_indicatorSelecter, R.drawable.selecter_slideindicator));
         setIndicatorBgColor(array.getColor(R.styleable.WelcomePage_indicatorBgColor, 0x2A000000));
-        setIndicatorSize(array.getDimension(R.styleable.WelcomePage_indicatorSize, dp2px(10)));
+        setIndicatorSize(array.getDimension(R.styleable.WelcomePage_indicatorSize, dp2px(30)));
         setIndicatorHeight(array.getDimension(R.styleable.WelcomePage_indicatorHeight, dp2px(50)));
+        setIndicatorMargin(array.getDimension(R.styleable.WelcomePage_indicatorMargin, dp2px(6)));
         array.recycle();
     }
 
@@ -105,6 +115,20 @@ public class WelcomePage extends FrameLayout {
      */
     public void setIndicatorSize(float indicatorSize) {
         this.indicatorSize = indicatorSize;
+    }
+
+    /**
+     * 获取指示器选择器
+     */
+    public float getIndicatorMargin() {
+        return indicatorMargin;
+    }
+
+    /**
+     * 设置指示器选择器
+     */
+    public void setIndicatorMargin(float indicatorMargin) {
+        this.indicatorMargin = indicatorMargin;
     }
 
     /**
@@ -153,6 +177,7 @@ public class WelcomePage extends FrameLayout {
         drawable.addState(new int[]{-android.R.attr.checked}, normal);
     }
 
+
     /**
      * 设置指示器
      *
@@ -160,15 +185,7 @@ public class WelcomePage extends FrameLayout {
      */
     public void setIndicatorSelecter(int indicatorSelecter) {
         this.indicatorSelecter = indicatorSelecter;
-        Drawable drawable = context.getResources().getDrawable(indicatorSelecter);
-    }
-
-    /**
-     * dp转px
-     */
-    private int dp2px(float dpValues) {
-        dpValues = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValues, context.getResources().getDisplayMetrics());
-        return (int) (dpValues + 0.5f);
+        drawable = context.getResources().getDrawable(indicatorSelecter);
     }
 
     /**
@@ -178,6 +195,46 @@ public class WelcomePage extends FrameLayout {
      */
     public void setData(List<Info> infoList) {
         this.infoList = infoList;
+    }
+
+    public void commit() {
+        initImage();
+        initIndicator();
+        bindingViewPager();
+        viewPager.setAdapter(new WelcomePagerAdapter());
+    }
+/**
+ * -------------------------------------------------------------------------------------------------
+ */
+    /**
+     * dp转px
+     */
+    private int dp2px(float dpValues) {
+        dpValues = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValues, context.getResources().getDisplayMetrics());
+        return (int) (dpValues + 0.5f);
+    }
+
+    /**
+     * viewpager绑定指示器
+     */
+    private void bindingViewPager() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
     }
 
     /**
@@ -200,20 +257,19 @@ public class WelcomePage extends FrameLayout {
      */
     private void initIndicator() {
         for (int k = 0; k < infoList.size(); k++) {
-            RadioButton rIndicator = new RadioButton(context);
-            rIndicator.setId(k);
-            rIndicator.setBackgroundResource(R.drawable.selecter_slideindicator);
-            rIndicator.setButtonDrawable(null);
-            indicator.addView(rIndicator);
+            View vIndicator = new View(context);
+            vIndicator.setId(k);
+            int size = (int) (indicatorSize + 0.5f);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size,size);
+            params.leftMargin = (int) (indicatorMargin / 2 + 0.5f);
+            params.rightMargin = (int) (indicatorMargin / 2 + 0.5f);
+            vIndicator.setLayoutParams(params);
+            vIndicator.setBackground(drawable);
+            indicator.addView(vIndicator);
         }
-        ((RadioButton)indicator.getChildAt(2)).setChecked(true);
+
     }
 
-    public void commit() {
-        initImage();
-        initIndicator();
-        viewPager.setAdapter(new WelcomePagerAdapter());
-    }
 
     /**
      * =================================================================
@@ -237,8 +293,10 @@ public class WelcomePage extends FrameLayout {
         @NonNull
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            container.addView(imageViewList.get(position));
-            return imageViewList.get(position);
+            ImageView view = imageViewList.get(position);
+            view.setScaleType(ImageView.ScaleType.FIT_XY);
+            container.addView(view);
+            return view;
         }
 
         @Override
