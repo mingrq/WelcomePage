@@ -7,7 +7,7 @@
     <com.ming.welcome_lib.WelcomePage
         android:id="@+id/welcome"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="match_parent"
         m:indicatorHeight="40dp"/>
 
 </RelativeLayout>

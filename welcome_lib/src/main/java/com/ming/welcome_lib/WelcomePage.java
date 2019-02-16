@@ -1,17 +1,15 @@
 package com.ming.welcome_lib;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +17,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
 import com.squareup.picasso.Picasso;
@@ -66,7 +62,7 @@ public class WelcomePage extends FrameLayout {
     private int indicatorEn;
 
     private TypedArray array;
-    private Context context;
+    private Activity activity;
     private ViewPager viewPager;
     private LinearLayout indicator;
     private List<Info> infoList;
@@ -83,7 +79,7 @@ public class WelcomePage extends FrameLayout {
 
     public WelcomePage(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.context = context;
+        activity = (Activity) context;
         LayoutInflater.from(context).inflate(R.layout.welcome, this);
         viewPager = findViewById(R.id.vp_welcome);
         indicator = findViewById(R.id.indicator);
@@ -172,8 +168,8 @@ public class WelcomePage extends FrameLayout {
      */
     public void setIndicatorSelecter(int indicator, int unIndicator) {
         StateListDrawable drawable = new StateListDrawable();
-        Drawable normal = context.getResources().getDrawable(unIndicator);
-        Drawable checked = context.getResources().getDrawable(indicator);
+        Drawable normal = activity.getResources().getDrawable(unIndicator);
+        Drawable checked = activity.getResources().getDrawable(indicator);
         drawable.addState(new int[]{android.R.attr.enabled}, checked);
         drawable.addState(new int[]{-android.R.attr.enabled}, normal);
     }
@@ -186,7 +182,7 @@ public class WelcomePage extends FrameLayout {
      */
     public void setIndicatorSelecter(int indicatorSelecter) {
         this.indicatorSelecter = indicatorSelecter;
-        drawable = context.getResources().getDrawable(indicatorSelecter);
+        drawable = activity.getResources().getDrawable(indicatorSelecter);
     }
 
     /**
@@ -211,7 +207,7 @@ public class WelcomePage extends FrameLayout {
      * dp转px
      */
     private int dp2px(float dpValues) {
-        dpValues = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValues, context.getResources().getDisplayMetrics());
+        dpValues = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValues, activity.getResources().getDisplayMetrics());
         return (int) (dpValues + 0.5f);
     }
 
@@ -247,11 +243,13 @@ public class WelcomePage extends FrameLayout {
         imageViewList = new ArrayList<>();
         for (int i = 0; i < infoList.size(); i++) {
             String uri = infoList.get(i).bannerUri;
-            ImageView imageView = new ImageView(context);
+            ImageView imageView = new ImageView(activity);
             imageView.setId(i);
             imageView.setBackgroundColor(0x303F9F);
-            Picasso.with(context).load(uri).error(R.drawable.unslideindicator).into(imageView);
-            imageViewList.add(imageView);
+            if (activity != null && imageView != null) {
+                Picasso.with(activity).load(uri).error(R.drawable.unslideindicator).into(imageView);
+                imageViewList.add(imageView);
+            }
         }
     }
 
@@ -260,9 +258,8 @@ public class WelcomePage extends FrameLayout {
      */
     private void initIndicator() {
         for (int k = 0; k < infoList.size(); k++) {
-            View vIndicator = new View(context);
+            View vIndicator = new View(activity);
             vIndicator.setId(k);
-
             int size = (int) (indicatorSize + 0.5f);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
             params.leftMargin = (int) (indicatorMargin / 2 + 0.5f);
